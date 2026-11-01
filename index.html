@@ -260,22 +260,27 @@
             </div>
             <span class="acc-chevron" style="color: #6E1E30; font-size: 20px; flex: 0 0 auto;">⌄</span>
           </div>
-          <div style="font-size: 14px; line-height: 1.6; color: #3B1420;">A full-stack, locally hosted AI web app that merges a RAG document Q&amp;A system and a multi-tool LangGraph agent into one chat interface. Built end to end with zero paid resources.</div>
+          <div style="font-size: 14px; line-height: 1.6; color: #3B1420;">A chat assistant for a platform operations team, deployed as microservices on Google Kubernetes Engine. It answers questions from runbooks, researches GitHub and Hacker News, and watches the cluster it runs on to explain failing pods and write incident summaries.</div>
         </summary>
         <div style="padding: 0 26px 28px; display: flex; flex-direction: column; gap: 14px;">
-          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #9C8761;">Python · FastAPI · LangGraph · LangChain · ChromaDB · BM25 · Sentence-Transformers · Ollama · React · Vite</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #9C8761;">Python · FastAPI · LangGraph · LangChain · ChromaDB · BM25 · Sentence-Transformers · Gemini API · MySQL · Redis · React · Vite · nginx · Docker · Kubernetes (GKE)</div>
 
           <div style="font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #6E1E30; margin-top: 4px;">What it does</div>
           <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 7px; font-size: 14px; line-height: 1.6; color: #7A3344;">
-            <li><strong style="color: #3B1420;">Document Q&amp;A (RAG):</strong> Upload PDF, DOCX, TXT or MD files and ask questions in plain language. Hybrid retrieval combines BM25 keyword search with dense vector search (ChromaDB) via Reciprocal Rank Fusion. A local LLM (Ollama, qwen2.5) writes a cited, grounded answer, and says so when the document doesn't contain one. Benchmarked 4 retrieval methods using Precision, Recall, Hit Rate and MRR.</li>
-            <li><strong style="color: #3B1420;">Live research agent:</strong> For open-ended questions, a LangGraph decision graph calls GitHub and Hacker News APIs in parallel and combines the results into a structured answer.</li>
+            <li><strong style="color: #3B1420;">Document Q&amp;A (RAG):</strong> Upload PDF, DOCX, TXT or MD files and ask questions in plain language. Hybrid retrieval combines BM25 keyword search with dense vector search (ChromaDB) via Reciprocal Rank Fusion, and answers come back cited and grounded in the sources. A built-in runbook corpus (OO-001 to OO-012) covers common platform incidents.</li>
+            <li><strong style="color: #3B1420;">Live research agent:</strong> For open-ended questions, a LangGraph agent calls GitHub, Hacker News and Google search tools and combines the results into a structured answer.</li>
+            <li><strong style="color: #3B1420;">AIOps on the cluster:</strong> Reads the cluster it runs on through a read-only service account. It can explain a failing pod from live events and logs, or run a one-click health check that writes an incident summary with next steps.</li>
+            <li><strong style="color: #3B1420;">Accounts and admin page:</strong> Users sign in with their own accounts and only see their own chats. An admin page shows who used the app, when and from where, with no access to anyone's chats.</li>
           </ul>
 
           <div style="font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #6E1E30; margin-top: 4px;">Engineering highlights</div>
           <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 7px; font-size: 14px; line-height: 1.6; color: #7A3344;">
-            <li><strong style="color: #3B1420;">Guardrails:</strong> Prompt-injection detection, empty-input blocking, and a faithfulness check that verifies answers against the retrieved source text.</li>
-            <li><strong style="color: #3B1420;">Automated evaluation:</strong> A 10+ test-case suite scored by a second LLM acting as judge, used to catch regressions during development.</li>
-            <li><strong style="color: #3B1420;">Persistence:</strong> SQLite-backed chat history and citations that survive across sessions.</li>
+            <li><strong style="color: #3B1420;">Microservices on GKE:</strong> Frontend, chat, auth and ops services plus MySQL, Chroma and Redis, each with its own Kubernetes Service behind a GCP load balancer and nginx. App pods are stateless, so any replica can serve any request. Containerised with Docker, and a docker-compose setup runs the full stack locally before deploying.</li>
+            <li><strong style="color: #3B1420;">Scaling and self-healing:</strong> Horizontal Pod Autoscalers on frontend, chat and auth (CPU target 60 to 70%), cluster autoscaling from 2 to 4 nodes, health and readiness probes, and PodDisruptionBudgets with replicas spread across nodes so draining a node does not take the app down.</li>
+            <li><strong style="color: #3B1420;">Zero-downtime releases:</strong> Rolling updates with no unavailable pods and one-command rollback. The footer shows which pod and version answered each request.</li>
+            <li><strong style="color: #3B1420;">Persistence:</strong> MySQL and Chroma run as StatefulSets with persistent disks, so accounts, chats and uploads survive pod restarts.</li>
+            <li><strong style="color: #3B1420;">Security:</strong> Salted scrypt password hashes, hashed session tokens, per-IP sign-in rate limits, least-privilege RBAC where only the ops service can read the cluster, secrets kept in Kubernetes Secrets, and a prompt-injection guardrail plus a faithfulness check on every chat message.</li>
+            <li><strong style="color: #3B1420;">Origins:</strong> Extends my earlier COMP2701 document Q&amp;A pipeline and research agent into a cloud-native system for INFS3208 Cloud Computing.</li>
           </ul>
         </div>
       </details>
